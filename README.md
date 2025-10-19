@@ -1,7 +1,18 @@
-# tpi-ayso API
+# UTN - TPI-AySO API
 
 Una API construida con Flask, Python y MongoDB, diseñada para operar en un entorno de desarrollo aislado utilizando Docker Compose.
 
+## ⚙️ Datos del Proyecto
+
+Trabajo Practico Integrador: Virtualización con Docker
+
+Grupo: Agustín De Armas, Hugo Adrián Isaurralde.
+
+Docente Titular: Martín Aristiaran.
+
+Docente Tutor: Andrés Odiard.
+
+Materia: Arquitectura y Sistemas Operativos
 
 ## ⚙️ Inicialización del Entorno (Desarrollo)
 
@@ -9,7 +20,8 @@ El entorno de la aplicación y la base de datos se inicia con un único script q
 
 ### 1. Clonar el Repositorio
 
-git clone https://github.com/agsdearmas/habit-tracker/
+git clone https://github.com/agsdearmas/tpi-ayso/
+
 cd tpi-ayso
 
 ### 2. Configurar Variables de Entorno
