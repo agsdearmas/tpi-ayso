@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # ────────────────────────────────
+  # Base de datos: MongoDB
+  # ────────────────────────────────
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      # <PUERTO_LOCAL>:<PUERTO_CONTENEDOR_MONGO>
+      - "27017:27017" 
+    environment:
+    # Inicializar el administrador de MongoDB
+      MONGO_INITDB_ROOT_USERNAME: ${DB_DEFAULT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_DEFAULT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_DEFAULT_NAME}
+    volumes:
+      # Persistencia de datos: Guarda los datos fuera del contenedor para que no se pierdan
+      - mongo-data:/data/db
+    networks:
+      - backend_net
+
+  # ────────────────────────────────
+  # Servicio principal: API Flask
+  # ────────────────────────────────
+  app:
+    build:
+      context: .. 
+      dockerfile: ./docker/Dockerfile
+    container_name: app
+    ports:
+      - "5000:5000"   # <PUERTO_LOCAL>:<PUERTO_CONTENEDOR_FLASK>
+    depends_on:
+      - mongo   # Asegurar MongoDB inicie antes que la app
+    env_file:
+      - ../.env
+    environment:
+      # Inyectar variables esenciales al contenedor
+      DB_DEFAULT_HOST: ${DB_DEFAULT_HOST}
+      DB_DEFAULT_USER: ${DB_DEFAULT_USER}
+      DB_DEFAULT_PASSWORD: ${DB_DEFAULT_PASSWORD}
+      FLASK_ENV: ${ENV_DEFAULT}
+      APP_SECRET_KEY: ${APP_SECRET_KEY}
+    networks:
+      - backend_net
+      - public_net
+  
+  # ────────────────────────────────
+  # Servicio de prueba: Cliente
+  # ────────────────────────────────
+  cliente:
+    image: curlimages/curl:8.6.0
+    container_name: cliente
+    depends_on:
+      - app
+    command: >
+      sh -c "
+        echo 'Iniciando pruebas periodicas de API...';
+        sleep 5;
+        while true; do
+          echo 'Ejecutando healthcheck:';
+          curl http://app:5000/healthcheck/mongo 2>&1;
+          sleep 30;
+        done
+      "
+    networks:
+      - public_net
+
+# ────────────────────────────────
+# Volumenes persistentes
+# ────────────────────────────────
+volumes:
+  mongo-data: # Define el volumen persistente para la DB
+
+# ────────────────────────────────
+# Redes virtuales
+# ────────────────────────────────
+networks:
+  backend_net:
+    driver: bridge
+  public_net:
+    driver: bridge

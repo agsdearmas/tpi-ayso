@@ -1,0 +1,14 @@
+# Entornos virtuales
+venv/
+.venv/
+__pycache__/
+
+# Logs y archivos temporales
+*.log
+
+
+# Directorio de datos de Docker
+mongo-data/
+
+# Variables de entorno
+#.env
